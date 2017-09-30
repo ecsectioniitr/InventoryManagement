@@ -32,7 +32,7 @@ class EquipmentInstance(models.Model):
 	is_available = models.BooleanField(default=True)
 	remark = models.CharField(max_length=200, blank=True)
 	decommisioned = models.BooleanField(default=False)
-	uid = models.CharField(max_length=50, unique=True)
+	uid = models.CharField(max_length=50, unique=True, blank=True)
 	def __str__(self):
 		return self.equipment.name+" "+self.uid
 
@@ -44,7 +44,7 @@ class Issueance(models.Model):
 	issued_on = models.DateTimeField(auto_now_add=True)
 	returned  = models.BooleanField(default = False)
 	def __str__(self):
-		return self.equipmentInstance.equipment.name+" "+self.equipment.uid+" for "+self.project.name
+		return self.equipmentInstance.equipment.name+" "+self.equipmentInstance.uid+" for "+self.project.name
 
 class IssueRequest(models.Model):
 	equipment = models.ForeignKey(Equipment, on_delete = models.CASCADE)
