@@ -16,6 +16,7 @@ class UserProfile(models.Model):
 	def __str__(self):
 		return self.user.username
 
+""" For creating a UserProfile object by default after a user object is created"""
 @receiver(post_save, sender=User)
 def create_user_userProfile(sender, instance, created, **kwargs):
 	if created:

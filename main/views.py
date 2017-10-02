@@ -12,6 +12,7 @@ from .tokens import account_activation_token
 from django.contrib.auth.models import User
 from django.core.mail import EmailMessage
 from .forms import *
+from .tables import EquipmentInstanceTable
 
 def signup(request):
     if request.method == 'POST':
@@ -52,4 +53,39 @@ def activate(request, uidb64, token):
         # return redirect('home')
         return HttpResponse('Thank you for your email confirmation. Now you can login your account.')
     else:
-        return HttpResponse('Activation link is invalid!')    
+        return HttpResponse('Activation link is invalid!')
+
+def search(request):
+	"""for searching different items available depending on get request,
+	display all items available for no filters """ 
+	equipment = EquipmentInstanceTable()	
+	return render(request, "main/search.html", {'equipment': equipment})   
+
+def issue(request):
+	"""check availability of the item ,
+	issuer should have admin access or isadmin=True """  
+
+def return_equipment(request):
+	"""check if all the related paramenters are correct,
+	return only by admin, 
+	calculate fine if any (may need to add a new model field)"""
+
+def issue_request(request):
+	""" generate a issue request for items unavailable """
+
+def cancel_issue_request(request):
+	"""cancel the issue request"""
+
+def update_profile(request):
+	"""update the userprofile"""
+
+
+def view_issue_request(request):
+	"""view all the issue request from newest to oldest"""
+
+def add_project(request):
+	""" add a project name and its members, permissions to be decided"""
+
+
+
+
