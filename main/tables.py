@@ -1,14 +1,14 @@
 from models import *
 from table import Table
-from table.columns import Column
+from table.columns import *
 
 class EquipmentInstanceTable(Table):
-	id = Column(field='id')
-	equipment = Column(field='equipment')
-	uid = Column(field='uid')
-	remark = Column(field='remark')
-	is_available = Column(field='is_available', header=u'Avalability')
-	decommisioned = Column(field='decommisioned', header=u'decommisioned')
+	id = Column(field='id', header=u'id')
+	equipment = Column(field='equipment.name', header=u'Equipment Type')
+	uid = Column(field='uid', header=u'UID')
+	remark = Column(field='remark', header=u'Remark')
+	is_available = CheckboxColumn(field='is_available', header=u'Availability')
+	decommisioned = CheckboxColumn(field='decommisioned', header=u'Decommisioned')
 
 
 	class Meta:

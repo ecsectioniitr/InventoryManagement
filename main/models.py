@@ -41,7 +41,7 @@ class Equipment(models.Model):
 
 class EquipmentInstance(models.Model):
 	equipment = models.ForeignKey(Equipment, on_delete = models.CASCADE)
-	buying_time = models.DateTimeField(blank=True)
+	buying_time = models.DateTimeField(blank=True, null=True)
 	is_available = models.BooleanField(default=True)
 	remark = models.CharField(max_length=200, blank=True)
 	decommisioned = models.BooleanField(default=False)
