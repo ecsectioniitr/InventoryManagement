@@ -55,6 +55,7 @@ class Issueance(models.Model):
 	equipmentInstance = models.ForeignKey(EquipmentInstance, on_delete=models.CASCADE)
 	year = models.IntegerField()
 	issued_on = models.DateTimeField(auto_now_add=True)
+	return_date = models.DateTimeField(auto_now_add = True)
 	returned  = models.BooleanField(default = False)
 	def __str__(self):
 		return self.equipmentInstance.equipment.name+" "+self.equipmentInstance.uid+" for "+self.project.name

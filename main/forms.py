@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
+from .models import *
 
 
 class SignupForm(UserCreationForm):
@@ -15,4 +16,11 @@ class SignupForm(UserCreationForm):
         data = self.cleaned_data['email']
         if User.objects.filter(email=data).exists():
             raise forms.ValidationError("This email already used")
-        return data    
+        return data  
+
+
+class ProjectForm(forms.ModelForm):
+    class Meta:
+        model = Project
+        fields = ('name','members')	
+		  
