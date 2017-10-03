@@ -13,6 +13,9 @@ from django.contrib.auth.models import User
 from django.core.mail import EmailMessage
 from .forms import *
 from .tables import EquipmentInstanceTable
+from .models import *
+from django_cron import CronJobBase, Schedule
+import datetime
 
 def signup(request):
     if request.method == 'POST':
@@ -72,6 +75,7 @@ def return_equipment(request):
 
 def issue_request(request):
 	""" generate a issue request for items unavailable """
+	
 
 def cancel_issue_request(request):
 	"""cancel the issue request"""
@@ -85,7 +89,24 @@ def view_issue_request(request):
 
 def add_project(request):
 	""" add a project name and its members, permissions to be decided"""
+"""    if request.method == "POST":	
+        form  = ProjectForm(request.POST)
+        if form.is_valid:
+            project_name = form.cleaned_data.get('project_name')
+            members = form.cleaned_data.get('members')
+         members to be called as a comma seperated list? """
 
-
+class MyCronJob(CronJobBase):
+    RUN_EVERY_MINS = 720 #runs once every 12 hours
+    schedule = Schedule(run_every_mins = RUN_EVERY_MINS)
+    code = "main.my_cron_job"
+    def do(self):
+        user = request.user.username
+        issueance = Issueance.objects.filter(issued_by = user)
+        if issueance.return_date <= datetime.datetime.now():
+            message = "your issuance period has exceeded, please return the equipment"
+        else:
+            message = " ";
+        pass
 
 
