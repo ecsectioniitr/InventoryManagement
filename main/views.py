@@ -67,13 +67,28 @@ def search(request):
 def issue(request):
 	"""check availability of the item ,
 	issuer should have admin access or isadmin=True """
+    form = IssueanceForm()
     if request.method = "POST":
-	if UserProfile.objects.get(user=request.user.username).is_admin = True:
+	if UserProfile.objects.get(user=request.user.username).is_admin == True:
+            form = IssueanceForm(request.POST)
+            if form.is_valid():
+                issued_by = form.cleaned_data.get('issued_by')
+                project = form.cleaned_data.get('project')
+                equipment = form.cleaned_data('equipmentInstance')
+		year = form.cleaned_date('year')
+		return_date = form.cleaned_data('return_date')
+		Issueance.objects.create(issued_by = issued_by, projecy = project, equipmentInstance = equipment, year = year, return_date = return_date)
+		notification = equipment + " has been issued to " + issued_by    	
+	    
 
 def return_equipment(request):
 	"""check if all the related paramenters are correct,
 	return only by admin, 
 	calculate fine if any (may need to add a new model field)"""
+    if request.method == "POST":
+        Issueance_pk = request.POST.get('Issueance_pk')
+	Issueance.objects.get(pk = Issueance_pk).update(returned = True)
+	notification = "equipment returned"
 
 def issue_request(request):
 	""" generate a issue request for items unavailable """
@@ -89,7 +104,7 @@ def issue_request(request):
 def cancel_issue_request(request):
 	"""cancel the issue request"""
     if request.method == "POST":
-	if UserProfile.objects.get(user=request.user.username).is_admin = True:
+	if UserProfile.objects.get(user=request.user.username).is_admin == True:
             issue_request_pk = request.POST.get('request_pk')
             issue_request = IssueRequest.objects.filter(pk=issue_request_pk)
             issue_request.delete()
@@ -103,7 +118,7 @@ def update_profile(request):
 def view_issue_request(request):
 	"""view all the issue request from newest to oldest"""
     if request.method == "POST":
-        if UserProfile.objects.get(user=request.user.username).is_admin = True:
+        if UserProfile.objects.get(user=request.user.username).is_admin == True:
             issue_requests = IssueRequest.objects.all.order_by('-pk')
             #return render(request,'main/view_issue_request.html',{'issue_requests'=issue_requests})
 
