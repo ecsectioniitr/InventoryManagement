@@ -66,7 +66,9 @@ def search(request):
 
 def issue(request):
 	"""check availability of the item ,
-	issuer should have admin access or isadmin=True """  
+	issuer should have admin access or isadmin=True """
+    if request.method = "POST":
+	if UserProfile.objects.get(user=request.user.username).is_admin = True:
 
 def return_equipment(request):
 	"""check if all the related paramenters are correct,
@@ -75,10 +77,24 @@ def return_equipment(request):
 
 def issue_request(request):
 	""" generate a issue request for items unavailable """
-	
+    if request.method == "POST":
+        equipment = request.POST.get('equipment_name')
+	equipment_queryset = EquipmentInstance.objects.get(equipment=equipment)
+	if equipment_queryset.is_available == True:
+            issue_request = IssueRequest(equipment = equipment, user = request.user.username, is_active=True)
+            notification = "Your Request has been registered"
+	else:
+	    notification = "Sorry the Equiment is unavailable"
 
 def cancel_issue_request(request):
 	"""cancel the issue request"""
+    if request.method == "POST":
+	if UserProfile.objects.get(user=request.user.username).is_admin = True:
+            issue_request_pk = request.POST.get('request_pk')
+            issue_request = IssueRequest.objects.filter(pk=issue_request_pk)
+            issue_request.delete()
+            """ send cancencellation notification to the respective user"""
+            notification = "Your request has been cancelled"
 
 def update_profile(request):
 	"""update the userprofile"""
@@ -86,16 +102,16 @@ def update_profile(request):
 
 def view_issue_request(request):
 	"""view all the issue request from newest to oldest"""
+    if request.method == "POST":
+        if UserProfile.objects.get(user=request.user.username).is_admin = True:
+            issue_requests = IssueRequest.objects.all.order_by('-pk')
+            #return render(request,'main/view_issue_request.html',{'issue_requests'=issue_requests})
 
 def add_project(request):
 	""" add a project name and its members, permissions to be decided"""
-"""    if request.method == "POST":	
-        form  = ProjectForm(request.POST)
-        if form.is_valid:
-            project_name = form.cleaned_data.get('project_name')
-            members = form.cleaned_data.get('members')
-         members to be called as a comma seperated list? """
 
+
+"""
 class MyCronJob(CronJobBase):
     RUN_EVERY_MINS = 720 #runs once every 12 hours
     schedule = Schedule(run_every_mins = RUN_EVERY_MINS)
@@ -109,4 +125,4 @@ class MyCronJob(CronJobBase):
             message = " ";
         pass
 
-
+"""
