@@ -68,7 +68,7 @@ def issue(request):
 	"""check availability of the item ,
 	issuer should have admin access or isadmin=True """
     form = IssueanceForm()
-    if request.method = "POST":
+    if request.method == "POST":
 	if UserProfile.objects.get(user=request.user.username).is_admin == True:
             form = IssueanceForm(request.POST)
             if form.is_valid():
