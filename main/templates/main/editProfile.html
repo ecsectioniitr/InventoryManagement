@@ -1,0 +1,13 @@
+{% extends 'main/base.html' %}
+
+{% block content %}
+    <form method="post" action=".">
+    {% csrf_token %}
+    {{ userform }}
+    {{ profileform }}
+    <input type="submit" name="">
+</form>
+
+
+{% endblock %}
+

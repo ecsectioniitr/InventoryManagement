@@ -112,6 +112,36 @@ def cancel_issue_request(request):
 
 def update_profile(request):
     """update the userprofile"""
+    if request.method == 'POST':
+        user = request.user
+        profile = UserProfile.objects.get(user=user)
+        userform = UserForm(request.POST, instance=user)
+        profileform = UserProfileForm(request.POST, instance=profile)
+        if userform.is_valid() and profileform.is_valid():
+            userform.save()
+            f = profileform.save(commit=False)
+            f.user = request.user
+            f.save()
+            context = {
+            'userform'  : userform,
+            'profileform': profileform
+            }   
+            return HttpResponseRedirect(reverse('main:editprofile'), context)
+        else :
+            context = {
+            'userform'  : userform,
+            'profileform': profileform
+            } 
+            return HttpResponseRedirect(reverse('main:editprofile'), context)
+    else:    
+        profile = UserProfile.objects.get(user = request.user)
+        userform = UserForm(instance=request.user)
+        profileform = UserProfileForm(instance=profile)
+        context = {
+            'userform'  : userform,
+            'profileform': profileform
+        }
+        return render(request, 'main/editProfile.html', context)
 
 
 def view_issue_request(request):

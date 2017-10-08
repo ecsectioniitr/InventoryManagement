@@ -25,5 +25,18 @@ class ProjectForm(forms.ModelForm):
     class Meta:
         model = Project
         fields = ('name','members')
-        widgets = {'members': autocomplete.ModelSelect2Multiple(url='user-autocomplete', attrs={'data-html': True})}	
+        widgets = {'members': autocomplete.ModelSelect2Multiple(url='user-autocomplete', attrs={'data-html': True})}
+
+
+class UserForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ['first_name', 'last_name']
+
+
+
+class UserProfileForm(forms.ModelForm):
+    class Meta:
+        model = UserProfile
+        fields = ['branch', 'enrollment_no', 'year']                  
 		  
