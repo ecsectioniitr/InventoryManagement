@@ -17,7 +17,11 @@ from .models import *
 from django_cron import CronJobBase, Schedule
 import datetime
 from dal import autocomplete
-from django.db.models import Q 
+from django.db.models import Q
+try:
+    from django.utils import simplejson as json
+except ImportError:
+    import json
 
 def signup(request):
     if request.method == 'POST':
@@ -75,40 +79,52 @@ def issue(request):
                 issued_by = form.cleaned_data.get('issued_by')
                 project = form.cleaned_data.get('project')
                 equipment = form.cleaned_data('equipmentInstance')
-        year = form.cleaned_date('year')
-        return_date = form.cleaned_data('return_date')
-        Issueance.objects.create(issued_by = issued_by, projecy = project, equipmentInstance = equipment, year = year, return_date = return_date)
-        notification = equipment + " has been issued to " + issued_by       
+                year = form.cleaned_date('year')
+                return_date = form.cleaned_data('return_date')
+                Issueance.objects.create(issued_by = issued_by, project = project, equipmentInstance = equipment, year = year, return_date = return_date)
+                notification = equipment + " has been issued to " + issued_by
+    return render(request, "main/issue.html", {'form': form})                    
         
 
 def return_equipment(request):
     if request.method == "POST" :
         Issueance_pk = request.POST.get('Issueance_pk')
-        Issueance.objects.get(pk = Issueance_pk).update(returned = True)
-        notification = "equipment returned"
+        if UserProfile.objects.get(user=request.user.username).is_admin == True:
+            Issueance.objects.get(pk = Issueance_pk).update(returned = True)
+            notification = "equipment returned"
+            ctx = { 'noti' : True,}
+            return HttpResponse(json.dumps(ctx), content_type='application/json')
+    ctx = { 'noti' : False,}
+    return HttpResponse(json.dumps(ctx), content_type='application/json')            
 
 
 def issue_request(request):
     """ generate a issue request for items unavailable """
     if request.method == "POST":
-        equipment = request.POST.get('equipment_name')
-    equipment_queryset = EquipmentInstance.objects.get(equipment=equipment)
-    if equipment_queryset.is_available == False:
-            issue_request = IssueRequest(equipment = equipment, user = request.user.username, is_active=True)
-            issue_request.save()
-            notification = "Your Request has been registered"
-    else:
-        notification = "Sorry the Equiment is unavailable"
+        equip = request.POST.get('id')
+        equipment = get_object_or_404(EquipmentInstance, pk=equip)
+        if equipment.is_available == False and equipment.decommisioned == False :
+            try:
+                issue_request = IssueRequest(equipment = equipment, user = request.user, is_active=True)
+                issue_request.save()
+                ctx = { 'noti' : True,}
+                return HttpResponse(json.dumps(ctx), content_type='application/json')
+            except IntegrityError:
+                ctx = { 'noti' : False,}
+                return HttpResponse(json.dumps(ctx), content_type='application/json')
 
 def cancel_issue_request(request):
     """cancel the issue request"""
     if request.method == "POST":
-        if UserProfile.objects.get(user=request.user.username).is_admin == True:
             issue_request_pk = request.POST.get('request_pk')
             issue_request = IssueRequest.objects.filter(pk=issue_request_pk)
-            issue_request.delete()
-            """ send cancencellation notification to the respective user"""
-            notification = "Your request has been cancelled"
+            if issue_request.user == request.user :
+                issue_request.delete()
+                ctx = { 'noti' : True,}
+                return HttpResponse(json.dumps(ctx), content_type='application/json')
+            else :
+                ctx = { 'noti' : False,}
+                return HttpResponse(json.dumps(ctx), content_type='application/json')
 
 def update_profile(request):
     """update the userprofile"""

@@ -14,4 +14,9 @@ urlpatterns = [
     url(r'^search/$', views.search, name='search'),
     url(r'^addproject/$', views.add_project, name='addproject'),
     url(r'^editprofile/$', views.update_profile, name='editprofile'),
+    url(r'^request/$', views.issue_request, name='request'),
+    url(r'^issue/$', views.issue, name='issue'),
+    url(r'^return/$', views.return_equipment, name='return'),
+    url(r'^cancelrequest/$', views.cancel_issue_request, name='cancelrequest'),
+    url(r'^viewrequest/$', views.view_issue_request, name='viewrequest'),
 ]
