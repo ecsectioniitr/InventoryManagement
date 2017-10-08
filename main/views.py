@@ -16,6 +16,8 @@ from .tables import EquipmentInstanceTable
 from .models import *
 from django_cron import CronJobBase, Schedule
 import datetime
+from dal import autocomplete
+from django.db.models import Q 
 
 def signup(request):
     if request.method == 'POST':
@@ -59,37 +61,39 @@ def activate(request, uidb64, token):
         return HttpResponse('Activation link is invalid!')
 
 def search(request):
-	"""for searching different items available depending on get request,
-	display all items available for no filters """ 
-	equipment = EquipmentInstanceTable()	
-	return render(request, "main/search.html", {'equipment': equipment})   
+    """for searching different items available depending on get request,
+    display all items available for no filters """ 
+    equipment = EquipmentInstanceTable()    
+    return render(request, "main/search.html", {'equipment': equipment})   
 
 def issue(request):
-	"""check availability of the item ,
-	issuer should have admin access or isadmin=True """
-    if request.method = "POST":
-	if UserProfile.objects.get(user=request.user.username).is_admin = True:
+    """check availability of the item ,
+    issuer should have admin access or isadmin=True """
+    if request.method == "POST":
+        if UserProfile.objects.get(user=request.user.username).is_admin == True:
+            print "hello"
 
 def return_equipment(request):
-	"""check if all the related paramenters are correct,
-	return only by admin, 
-	calculate fine if any (may need to add a new model field)"""
+    """check if all the related paramenters are correct,
+    return only by admin, 
+    calculate fine if any (may need to add a new model field)"""
 
 def issue_request(request):
-	""" generate a issue request for items unavailable """
+    """ generate a issue request for items unavailable """
     if request.method == "POST":
         equipment = request.POST.get('equipment_name')
-	equipment_queryset = EquipmentInstance.objects.get(equipment=equipment)
-	if equipment_queryset.is_available == True:
+    equipment_queryset = EquipmentInstance.objects.get(equipment=equipment)
+    if equipment_queryset.is_available == False:
             issue_request = IssueRequest(equipment = equipment, user = request.user.username, is_active=True)
+            issue_request.save()
             notification = "Your Request has been registered"
-	else:
-	    notification = "Sorry the Equiment is unavailable"
+    else:
+        notification = "Sorry the Equiment is unavailable"
 
 def cancel_issue_request(request):
-	"""cancel the issue request"""
+    """cancel the issue request"""
     if request.method == "POST":
-	if UserProfile.objects.get(user=request.user.username).is_admin = True:
+        if UserProfile.objects.get(user=request.user.username).is_admin == True:
             issue_request_pk = request.POST.get('request_pk')
             issue_request = IssueRequest.objects.filter(pk=issue_request_pk)
             issue_request.delete()
@@ -97,18 +101,27 @@ def cancel_issue_request(request):
             notification = "Your request has been cancelled"
 
 def update_profile(request):
-	"""update the userprofile"""
+    """update the userprofile"""
 
 
 def view_issue_request(request):
-	"""view all the issue request from newest to oldest"""
+    """view all the issue request from newest to oldest"""
     if request.method == "POST":
-        if UserProfile.objects.get(user=request.user.username).is_admin = True:
+        if UserProfile.objects.get(user=request.user.username).is_admin == True:
             issue_requests = IssueRequest.objects.all.order_by('-pk')
             #return render(request,'main/view_issue_request.html',{'issue_requests'=issue_requests})
 
 def add_project(request):
-	""" add a project name and its members, permissions to be decided"""
+    """ add a project name and its members, permissions to be decided"""
+    form = ProjectForm()
+    if request.method == "POST":
+        form = ProjectForm(request.POST)
+        if form.is_valid:
+            form.save()
+            return HttpResponse('Project Successfully Added')
+    return render(request, "main/addProject.html", {'form': form})        
+
+    
 
 
 """
@@ -126,3 +139,15 @@ class MyCronJob(CronJobBase):
         pass
 
 """
+
+class UserAutocomplete(autocomplete.Select2QuerySetView):
+    def get_queryset(self):
+        query = UserProfile.objects.all()
+        qs = []
+        for userp in query:
+            qs.append(userp.user)
+
+        if self.q:
+            qs = qs.filter( Q(first_name__icontains = term) | Q(last_name__icontains = term)  | Q(username__icontains = term))
+        return qs
+

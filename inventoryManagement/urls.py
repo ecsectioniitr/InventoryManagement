@@ -17,11 +17,17 @@ from django.conf.urls import include,url
 from django.contrib import admin
 from django.conf.urls.static import static
 from django.conf import settings
+from main.views import UserAutocomplete
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^table/', include('table.urls')),
     url(r'^', include('main.urls')),
+    url(
+        r'^user-autocomplete/$',
+        UserAutocomplete.as_view(),
+        name='user-autocomplete',
+    ),
     
 ]
 
