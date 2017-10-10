@@ -49,6 +49,8 @@ def signup(request):
     return render(request, 'main/signup.html', {'form': form})
 
 
+
+
 def activate(request, uidb64, token):
     try:
         uid = force_text(urlsafe_base64_decode(uidb64))
@@ -76,13 +78,10 @@ def issue(request):
         if UserProfile.objects.get(user=request.user.username).is_admin == True:
             form = IssueanceForm(request.POST)
             if form.is_valid():
-                issued_by = form.cleaned_data.get('issued_by')
-                project = form.cleaned_data.get('project')
-                equipment = form.cleaned_data('equipmentInstance')
-                year = form.cleaned_date('year')
-                return_date = form.cleaned_data('return_date')
-                Issueance.objects.create(issued_by = issued_by, project = project, equipmentInstance = equipment, year = year, return_date = return_date)
-                notification = equipment + " has been issued to " + issued_by
+                issue = form.save()
+                notification = issue.equipment + " has been issued to " + issue.issued_by
+        else:
+            HttpResponse('You dont have required permissions to issue the equipment')        
     return render(request, "main/issue.html", {'form': form})                    
         
 
@@ -169,13 +168,7 @@ def view_issue_request(request):
 
 def add_project(request):
     """ add a project name and its members, permissions to be decided"""
-    form = ProjectForm()
-    if request.method == "POST":
-        form = ProjectForm(request.POST)
-        if form.is_valid:
-            form.save()
-            return HttpResponse('Project Successfully Added')
-    return render(request, "main/addProject.html", {'form': form})        
+    return handlePopAdd(request, ProjectForm)        
 
     
 
@@ -207,3 +200,31 @@ class UserAutocomplete(autocomplete.Select2QuerySetView):
             qs = qs.filter( Q(first_name__icontains = term) | Q(last_name__icontains = term)  | Q(username__icontains = term))
         return qs
 
+
+class ProjectAutocomplete(autocomplete.Select2QuerySetView):
+    def get_queryset(self):
+        qs = Project.objects.all()
+
+        if self.q:
+            qs = qs.filter( Q(name__icontains = term) | Q(name__contains = term))
+        return qs
+
+
+
+from django.utils.html import escape
+def handlePopAdd(request, addForm):
+    if request.method == "POST":
+        form = addForm(request.POST)
+        if form.is_valid():
+            try:
+                newObject = form.save()
+            except forms.ValidationError, error:
+                newObject = None
+            if newObject:
+                return HttpResponse('<script type="text/javascript">opener.dismissAddAnotherPopup(window, "%s", "%s");</script><script type="text/javascript">self.close();</script>' % \
+                    (escape(newObject._get_pk_val()), escape(newObject)))
+    else:
+        form = addForm()
+        context = {'form': form}
+        #return render_to_response("main/addProject.html", pageContext)
+        return render(request, 'main/addProject.html', context)

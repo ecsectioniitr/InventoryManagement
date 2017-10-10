@@ -17,7 +17,8 @@ from django.conf.urls import include,url
 from django.contrib import admin
 from django.conf.urls.static import static
 from django.conf import settings
-from main.views import UserAutocomplete
+from main.views import UserAutocomplete , ProjectAutocomplete
+from main.views import *
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
@@ -28,6 +29,12 @@ urlpatterns = [
         UserAutocomplete.as_view(),
         name='user-autocomplete',
     ),
+    url(
+        r'^user-autocomplete/$',
+        ProjectAutocomplete.as_view(),
+        name='project-autocomplete',
+    ),
+    url(r'^addproject/$', add_project, name='addproject'),
     
 ]
 

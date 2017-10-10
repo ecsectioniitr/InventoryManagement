@@ -1,19 +1,6 @@
-{% extends 'main/base.html' %}
-{% load static %}
-{% block content %}
-    <form method="post" action=".">
-    {% csrf_token %}
-    {{ form }}
-    <input type="submit" name="">
-     | <a href="javascript:window.close()">Cancel</a>
-</form>
 
 
-{% endblock %}
-
-{% block script %}
-<script type="text/javascript" src="{% static 'admin/js/vendor/jquery/jquery.js' %}"></script>
-<script>(function(globals) {
+(function(globals) {
 
   var django = globals.django || (globals.django = {});
 
@@ -134,13 +121,4 @@
     django.jsi18n_initialized = true;
   }
 
-}(this));</script>
-<script type="text/javascript" src="{% static 'admin/js/admin/RelatedObjectLookups.js' %}"></script>
-
-<script type="text/javascript" src="{% static 'admin/js/core.js' %}"></script>
-<script type="text/javascript" src="{% static 'admin/js/SelectBox.js' %}"></script>
-<script type="text/javascript" src="{% static 'admin/js/SelectFilter2.js' %}"></script>
-<link rel="stylesheet" type="text/css" href="{% static 'admin/css/widgets.css' %}" />
-
-{{ form.media }}
-{% endblock %}
+}(this));
