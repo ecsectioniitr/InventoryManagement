@@ -12,7 +12,7 @@ from .tokens import account_activation_token
 from django.contrib.auth.models import User
 from django.core.mail import EmailMessage
 from .forms import *
-from .tables import EquipmentInstanceTable
+from .tables import *
 from .models import *
 from django_cron import CronJobBase, Schedule
 import datetime
@@ -69,13 +69,17 @@ def activate(request, uidb64, token):
 def search(request):
     """for searching different items available depending on get request,
     display all items available for no filters """ 
-    equipment = EquipmentInstanceTable()    
+    if UserProfile.objects.get(user=request.user).is_admin == True:
+        equipment = EquipmentInstanceAdmTable() 
+    else:
+        equipment = EquipmentInstanceTable()  
+    print equipment     
     return render(request, "main/search.html", {'equipment': equipment})   
 
 def issue(request):
     form = IssueanceForm()
     if request.method == "POST":
-        if UserProfile.objects.get(user=request.user.username).is_admin == True:
+        if UserProfile.objects.get(user=request.user).is_admin == True:
             form = IssueanceForm(request.POST)
             if form.is_valid():
                 issue = form.save(commit = False)
@@ -239,8 +243,11 @@ from table.views import FeedDataView
 
 
 class MyDataView(FeedDataView):
-
     token = EquipmentInstanceTable.token
-
     def get_queryset(self):
-        return super(MyDataView, self).get_queryset().filter(decommisioned=False)        
+        return super(MyDataView, self).get_queryset().filter(decommisioned=False) 
+
+class MyAdmDataView(FeedDataView):
+    token = EquipmentInstanceAdmTable.token
+    def get_queryset(self):
+        return super(MyAdmDataView, self).get_queryset().filter(decommisioned=False)                             
