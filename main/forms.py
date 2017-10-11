@@ -80,7 +80,7 @@ class IssueanceForm(forms.ModelForm):
                                 )
     class Meta:
         model = Issueance
-        fields = ['issued_by', 'project', 'year', 'equipmentInstance'] 
+        fields = ['issued_by', 'project', 'year'] 
         widgets = {'project': autocomplete.ModelSelect2(url='project-autocomplete', attrs={'data-html': True}),
                     'issued_by' :autocomplete.ModelSelect2(url='user-autocomplete') }                        
           

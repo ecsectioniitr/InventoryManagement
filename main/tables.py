@@ -14,11 +14,14 @@ class IssueColumn(Column):
 class AdmColumn(Column):
     def render(self, value):
         if value.is_available:
-            value = reverse('main:issue')
+            f = value.id
+            value = reverse('main:issue', kwargs={'issue_id':f})
             return format_html('<a href = "{}">Issue</a>', value)
         else:
-            value = reverse('main:return')
-            return format_html('<a href = "{}">Return</a>', value)
+            issue = value.issueance_set.all()
+            qs = issue.filter(returned=False)
+            iss = qs[0]
+            return format_html('<input type="button" id="{}-likebutton" name="{}" value="Return" onclick="likepost(this.name)" />', iss.id , iss.id )
                 
          
 

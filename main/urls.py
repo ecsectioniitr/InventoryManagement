@@ -16,9 +16,9 @@ urlpatterns = [
     url(r'^addproject/$', views.add_project, name='addproject'),
     url(r'^editprofile/$', views.update_profile, name='editprofile'),
     url(r'^request/$', views.issue_request, name='request'),
-    url(r'^issue/$', views.issue, name='issue'),
+    url(r'^issue/(?P<issue_id>[0-9]+)/$', views.issue, name='issue'),
     url(r'^return/$', views.return_equipment, name='return'),
     url(r'^cancelrequest/$', views.cancel_issue_request, name='cancelrequest'),
     url(r'^viewrequest/$', views.view_issue_request, name='viewrequest'),
-    url(r'^table/data/$', MyDataView.as_view(), name='table_data'),
+    
 ]

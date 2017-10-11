@@ -18,6 +18,7 @@ from django_cron import CronJobBase, Schedule
 import datetime
 from dal import autocomplete
 from django.db.models import Q
+from django.utils import timezone
 try:
     from django.utils import simplejson as json
 except ImportError:
@@ -76,26 +77,42 @@ def search(request):
     print equipment     
     return render(request, "main/search.html", {'equipment': equipment})   
 
-def issue(request):
+def issue(request, issue_id):
     form = IssueanceForm()
     if request.method == "POST":
         if UserProfile.objects.get(user=request.user).is_admin == True:
             form = IssueanceForm(request.POST)
             if form.is_valid():
-                issue = form.save(commit = False)
-                issue.is_available = False
-                issue.save()
-                notification = issue.equipment + " has been issued to " + issue.issued_by
+                equip = get_object_or_404(EquipmentInstance, pk=issue_id)
+                if equip.is_available:
+                    issue = form.save(commit = False)
+                    issue.equipmentInstance = equip
+                    issue.save()
+                    equip.is_available = False
+                    equip.save()
+                    return HttpResponseRedirect(reverse('main:search'))
+                else:
+                    return HttpResponse('Equipment already issued')
+                        
         else:
-            HttpResponse('You dont have required permissions to issue the equipment')        
+            return HttpResponse('You dont have required permissions to issue the equipment')        
     return render(request, "main/issue.html", {'form': form})                    
         
 
 def return_equipment(request):
     if request.method == "POST" :
         Issueance_pk = request.POST.get('Issueance_pk')
-        if UserProfile.objects.get(user=request.user.username).is_admin == True:
-            Issueance.objects.get(pk = Issueance_pk).update(returned = True)
+        if UserProfile.objects.get(user=request.user).is_admin == True:
+            issue = Issueance.objects.get(pk = Issueance_pk)
+            equipment = issue.equipmentInstance
+            issue.returned = True
+            issue.save()
+            issue.return_date = timezone.now()
+            equipment.is_available=True
+            issue.save()
+            equipment.save()
+
+
             notification = "equipment returned"
             ctx = { 'noti' : True,}
             return HttpResponse(json.dumps(ctx), content_type='application/json')

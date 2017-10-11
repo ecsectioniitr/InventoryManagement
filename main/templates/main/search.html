@@ -16,5 +16,23 @@
         <br />
         {% render_table equipment %}
     </div>
+    <script>
+
+function likepost(name){
+        console.log(name);
+      $.ajax({
+               type: "POST",
+               url: "{% url 'main:return' %}",
+               data: {'Issueance_pk': name, 'csrfmiddlewaretoken': '{{ csrf_token }}'},
+               dataType: "json",
+               success: function(response) {
+                   location.reload()
+                },
+                error: function(rs, e) {
+                       alert(rs.responseText);
+                }
+          }); 
+    }
+</script>
 </body>
 </html>
