@@ -78,7 +78,9 @@ def issue(request):
         if UserProfile.objects.get(user=request.user.username).is_admin == True:
             form = IssueanceForm(request.POST)
             if form.is_valid():
-                issue = form.save()
+                issue = form.save(commit = False)
+                issue.is_available = False
+                issue.save()
                 notification = issue.equipment + " has been issued to " + issue.issued_by
         else:
             HttpResponse('You dont have required permissions to issue the equipment')        
@@ -228,3 +230,17 @@ def handlePopAdd(request, addForm):
         context = {'form': form}
         #return render_to_response("main/addProject.html", pageContext)
         return render(request, 'main/addProject.html', context)
+
+
+
+
+    # views.py
+from table.views import FeedDataView
+
+
+class MyDataView(FeedDataView):
+
+    token = EquipmentInstanceTable.token
+
+    def get_queryset(self):
+        return super(MyDataView, self).get_queryset().filter(decommisioned=False)        

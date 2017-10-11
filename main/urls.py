@@ -2,6 +2,7 @@ from django.conf.urls import url
 from django.contrib import admin
 from django.contrib.auth import views as auth_views
 from . import views
+from main.views import *
 
 app_name = 'main'
 urlpatterns = [
@@ -19,4 +20,5 @@ urlpatterns = [
     url(r'^return/$', views.return_equipment, name='return'),
     url(r'^cancelrequest/$', views.cancel_issue_request, name='cancelrequest'),
     url(r'^viewrequest/$', views.view_issue_request, name='viewrequest'),
+    url(r'^table/data/$', MyDataView.as_view(), name='table_data'),
 ]
