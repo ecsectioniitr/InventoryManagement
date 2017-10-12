@@ -7,9 +7,7 @@ from django.core.urlresolvers import reverse
 
 class IssueColumn(Column):
     def render(self, value):
-        if not value.is_available:
-            value = reverse('main:request')
-            return format_html('<a href = "{}">Request</a>', value)
+            return format_html('<span id = "{}-user"></span>', value.id)
 
 class AdmColumn(Column):
     def render(self, value):
@@ -21,7 +19,7 @@ class AdmColumn(Column):
             issue = value.issueance_set.all()
             qs = issue.filter(returned=False)
             iss = qs[0]
-            return format_html('<input type="button" id="{}-likebutton" name="{}" value="Return" onclick="likepost(this.name)" />', iss.id , iss.id )
+            return format_html('<input type="button" id="{}-return" name="{}" value="Return" onclick="returnequip(this.name)" />', iss.id , iss.id )
                 
          
 

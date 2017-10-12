@@ -46,6 +46,7 @@ class EquipmentInstance(models.Model):
     remark = models.CharField(max_length=200, blank=True)
     decommisioned = models.BooleanField(default=False)
     uid = models.CharField(max_length=50, unique=True, blank=True)
+    issuerq = models.ManyToManyField(User, through='IssueRequest', blank=True)
     def __str__(self):
         return self.equipment.name+" "+self.uid
 
@@ -62,13 +63,13 @@ class Issueance(models.Model):
 
 class IssueRequest(models.Model):
     equipment = models.ForeignKey(EquipmentInstance, on_delete = models.CASCADE)
-    user = models.ForeignKey(User, on_delete = models.CASCADE)
+    user = models.ForeignKey(User, on_delete = models.CASCADE, related_name="issuerq")
     created_on = models.DateTimeField(auto_now_add=True)
     is_active = models.BooleanField(default=True)    
     class Meta:
         unique_together = (('equipment', 'user'),)
     def __str__(self):
-        return self.equipment.name+" by "+self.user.username
+        return self.equipment.equipment.name+" "+self.equipment.uid+" by "+self.user.username   
 
 
 

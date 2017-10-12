@@ -70,12 +70,12 @@ def activate(request, uidb64, token):
 def search(request):
     """for searching different items available depending on get request,
     display all items available for no filters """ 
+    equipmentInstances = EquipmentInstance.objects.all()
     if UserProfile.objects.get(user=request.user).is_admin == True:
         equipment = EquipmentInstanceAdmTable() 
     else:
-        equipment = EquipmentInstanceTable()  
-    print equipment     
-    return render(request, "main/search.html", {'equipment': equipment})   
+        equipment = EquipmentInstanceTable()      
+    return render(request, "main/search.html", {'equipment': equipment, 'equipmentInstances': equipmentInstances})   
 
 def issue(request, issue_id):
     form = IssueanceForm()
@@ -139,7 +139,7 @@ def cancel_issue_request(request):
     """cancel the issue request"""
     if request.method == "POST":
             issue_request_pk = request.POST.get('request_pk')
-            issue_request = IssueRequest.objects.filter(pk=issue_request_pk)
+            issue_request = get_object_or_404(IssueRequest, pk=issue_request_pk)
             if issue_request.user == request.user :
                 issue_request.delete()
                 ctx = { 'noti' : True,}

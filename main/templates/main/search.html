@@ -15,10 +15,15 @@
         <h1>Equipments</h1>
         <br />
         {% render_table equipment %}
+
+       
     </div>
+
+
     <script>
 
-function likepost(name){
+
+function returnequip(name){
         console.log(name);
       $.ajax({
                type: "POST",
@@ -33,6 +38,55 @@ function likepost(name){
                 }
           }); 
     }
+
+function cancelreq(name){
+        console.log(name);
+      $.ajax({
+               type: "POST",
+               url: "{% url 'main:cancelrequest' %}",
+               data: {'request_pk': name, 'csrfmiddlewaretoken': '{{ csrf_token }}'},
+               dataType: "json",
+               success: function(response) {
+                   location.reload()
+                },
+                error: function(rs, e) {
+                       alert(rs.responseText);
+                }
+          }); 
+    }
+
+function makereq(name){
+        console.log(name);
+      $.ajax({
+               type: "POST",
+               url: "{% url 'main:request' %}",
+               data: {'id': name, 'csrfmiddlewaretoken': '{{ csrf_token }}'},
+               dataType: "json",
+               success: function(response) {
+                   location.reload()
+                },
+                error: function(rs, e) {
+                       alert(rs.responseText);
+                }
+          }); 
+    }        
 </script>
+<script type="text/javascript">
+    
+ {% for equipment in equipmentInstances %}
+            {% if not equipment.is_available %}
+                {% if request.user in equipment.issuerq.all %}
+                {% for issuerq in request.user.issuerq.all %}
+                    {% if issuerq.equipment.id == equipment.id %}
+                    setTimeout(function () {$('#'+{{ equipment.id }}+'-user').html( '<input type="button"  name="'+{{issuerq.id }}+'" value="Cancel Request" onclick="cancelreq(this.name)" />' );}, 1000)
+                    {% endif %}
+                {% endfor %}
+                
+                {% else %}
+                     setTimeout(function () {$('#'+{{ equipment.id }}+'-user').html( '<input type="button"  name="'+{{equipment.id }}+'" value="Request" onclick="makereq(this.name)" />' );}, 1000)
+                {% endif %}
+            {% endif %}
+        {% endfor %} 
+        </script>
 </body>
 </html>
