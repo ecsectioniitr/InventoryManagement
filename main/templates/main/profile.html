@@ -1,0 +1,19 @@
+{% extends 'main/base.html' %}
+
+{% load static %}
+{% block content %}
+<center>
+    <h1>{{ userp.username }}</h1>
+    <h2>{{ userp.first_name }} {{ user.last_name }}</h2>
+    <h3> {{ userp.email }}</h3>
+    <br><br>
+    <ul>
+    	{% if userprofile.enrollment_no %}<li>Enrollment No.: {{ userprofile.enrollment_no }}</li>{% endif %}
+    	{% if userprofile.branch %}<li> Branch : {{ userprofile.branch }}</li>{% endif %}
+    	{% if userprofile.year %}<li>Year : {{ userprofile.year }} </li>{% endif %}
+    </ul>
+    <br>
+    {% if userp == request.user %}<a href="{% url 'main:editprofile' %}"><h3>Edit Profile</h3></a>{% endif %}
+</center>
+
+{% endblock %}

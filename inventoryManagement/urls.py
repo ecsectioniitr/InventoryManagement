@@ -37,6 +37,8 @@ urlpatterns = [
     url(r'^addproject/$', add_project, name='addproject'),
     url(r'^table/data/$', MyDataView.as_view(), name='table_data'),
     url(r'^table/admdata/$', MyAdmDataView.as_view(), name='admtable_data'),
+    url(r'^table/issuedata/$', MyIssueView.as_view(), name='issuetable_data'),
+    url(r'^table/admissuedata/$', MyAdmIssueView.as_view(), name='admissuetable_data'),
     
 ]
 

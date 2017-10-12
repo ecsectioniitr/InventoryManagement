@@ -1,0 +1,51 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    {% load static %}
+    {% load table_tags %}
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>Issued Equipments</title>
+    <link href="{% static 'table/css/bootstrap.min.css' %}" rel="stylesheet">
+    <script src="{% static 'table/js/jquery.min.js' %}"></script>
+    <script src="{% static 'table/js/bootstrap.min.js' %}"></script>
+</head>
+<body>
+  <center>
+        <a href="{% url 'main:search' %}"><h5>Home</h5></a>
+        <a href="{% url 'main:profile' request.user.id %}"><h5>My Profile</h5></a>
+        <a href="{% url 'main:editprofile' %}"><h5>Edit Profile</h5></a>
+        <a href="{% url 'main:issueances' %}"><h5>Issued Equipments</h5></a>
+        <a href="{% url 'main:logout' %}"><h5>Logout</h5></a>
+    </center>
+    <div class="container" style="margin-top: 10px">
+        <h1>Issued Equipments</h1>
+        <br />
+        {% render_table issuetable %}
+
+       
+    </div>
+    
+
+
+    <script>
+
+
+function returnequip(name){
+        console.log(name);
+      $.ajax({
+               type: "POST",
+               url: "{% url 'main:return' %}",
+               data: {'Issueance_pk': name, 'csrfmiddlewaretoken': '{{ csrf_token }}'},
+               dataType: "json",
+               success: function(response) {
+                   location.reload();
+                },
+                error: function(rs, e) {
+                       alert(rs.responseText);
+                }
+          }); 
+    }
+</script>
+</body>
+</html>

@@ -67,6 +67,7 @@ def activate(request, uidb64, token):
     else:
         return HttpResponse('Activation link is invalid!')
 
+@login_required(login_url='/')
 def search(request):
     """for searching different items available depending on get request,
     display all items available for no filters """ 
@@ -75,79 +76,25 @@ def search(request):
         equipment = EquipmentInstanceAdmTable() 
     else:
         equipment = EquipmentInstanceTable()      
-    return render(request, "main/search.html", {'equipment': equipment, 'equipmentInstances': equipmentInstances})   
-
-def issue(request, issue_id):
-    form = IssueanceForm()
-    if request.method == "POST":
-        if UserProfile.objects.get(user=request.user).is_admin == True:
-            form = IssueanceForm(request.POST)
-            if form.is_valid():
-                equip = get_object_or_404(EquipmentInstance, pk=issue_id)
-                if equip.is_available:
-                    issue = form.save(commit = False)
-                    issue.equipmentInstance = equip
-                    issue.save()
-                    equip.is_available = False
-                    equip.save()
-                    return HttpResponseRedirect(reverse('main:search'))
-                else:
-                    return HttpResponse('Equipment already issued')
-                        
-        else:
-            return HttpResponse('You dont have required permissions to issue the equipment')        
-    return render(request, "main/issue.html", {'form': form})                    
-        
-
-def return_equipment(request):
-    if request.method == "POST" :
-        Issueance_pk = request.POST.get('Issueance_pk')
-        if UserProfile.objects.get(user=request.user).is_admin == True:
-            issue = Issueance.objects.get(pk = Issueance_pk)
-            equipment = issue.equipmentInstance
-            issue.returned = True
-            issue.save()
-            issue.return_date = timezone.now()
-            equipment.is_available=True
-            issue.save()
-            equipment.save()
+    return render(request, "main/search.html", {'equipment': equipment, 'equipmentInstances': equipmentInstances})
 
 
-            notification = "equipment returned"
-            ctx = { 'noti' : True,}
-            return HttpResponse(json.dumps(ctx), content_type='application/json')
-    ctx = { 'noti' : False,}
-    return HttpResponse(json.dumps(ctx), content_type='application/json')            
+@login_required(login_url='/')
+def all_issues(request):
+    issuetable = IssueanceTable()
+    if UserProfile.objects.get(user=request.user).is_admin == True:
+        issuetable = IssueanceAdmTable()
+    return render(request, "main/issues.html", {'issuetable': issuetable})
 
 
-def issue_request(request):
-    """ generate a issue request for items unavailable """
-    if request.method == "POST":
-        equip = request.POST.get('id')
-        equipment = get_object_or_404(EquipmentInstance, pk=equip)
-        if equipment.is_available == False and equipment.decommisioned == False :
-            try:
-                issue_request = IssueRequest(equipment = equipment, user = request.user, is_active=True)
-                issue_request.save()
-                ctx = { 'noti' : True,}
-                return HttpResponse(json.dumps(ctx), content_type='application/json')
-            except IntegrityError:
-                ctx = { 'noti' : False,}
-                return HttpResponse(json.dumps(ctx), content_type='application/json')
+@login_required(login_url='/')
+def profile(request, id):
+    user  = get_object_or_404(User, pk=id)
+    userprofile = get_object_or_404(UserProfile, user=user)
+    return render(request, "main/profile.html", {'userp': user, 'userprofile': userprofile})
 
-def cancel_issue_request(request):
-    """cancel the issue request"""
-    if request.method == "POST":
-            issue_request_pk = request.POST.get('request_pk')
-            issue_request = get_object_or_404(IssueRequest, pk=issue_request_pk)
-            if issue_request.user == request.user :
-                issue_request.delete()
-                ctx = { 'noti' : True,}
-                return HttpResponse(json.dumps(ctx), content_type='application/json')
-            else :
-                ctx = { 'noti' : False,}
-                return HttpResponse(json.dumps(ctx), content_type='application/json')
 
+@login_required(login_url='/')
 def update_profile(request):
     """update the userprofile"""
     if request.method == 'POST':
@@ -182,6 +129,86 @@ def update_profile(request):
         return render(request, 'main/editProfile.html', context)
 
 
+@login_required(login_url='/')
+def issue(request, issue_id):
+    form = IssueanceForm()
+    if request.method == "POST":
+        if UserProfile.objects.get(user=request.user).is_admin == True:
+            form = IssueanceForm(request.POST)
+            if form.is_valid():
+                equip = get_object_or_404(EquipmentInstance, pk=issue_id)
+                if equip.is_available:
+                    issue = form.save(commit = False)
+                    issue.equipmentInstance = equip
+                    issue.save()
+                    equip.is_available = False
+                    equip.save()
+                    return HttpResponseRedirect(reverse('main:search'))
+                else:
+                    return HttpResponse('Equipment already issued')
+                        
+        else:
+            return HttpResponse('You dont have required permissions to issue the equipment')        
+    return render(request, "main/issue.html", {'form': form})                    
+        
+
+@login_required(login_url='/')
+def return_equipment(request):
+    if request.method == "POST" :
+        Issueance_pk = request.POST.get('Issueance_pk')
+        if UserProfile.objects.get(user=request.user).is_admin == True:
+            issue = Issueance.objects.get(pk = Issueance_pk)
+            equipment = issue.equipmentInstance
+            issue.returned = True
+            issue.save()
+            issue.return_date = timezone.now()
+            equipment.is_available=True
+            issue.save()
+            equipment.save()
+
+
+            notification = "equipment returned"
+            ctx = { 'noti' : True,}
+            return HttpResponse(json.dumps(ctx), content_type='application/json')
+    ctx = { 'noti' : False,}
+    return HttpResponse(json.dumps(ctx), content_type='application/json')            
+
+
+@login_required(login_url='/')
+def issue_request(request):
+    """ generate a issue request for items unavailable """
+    if request.method == "POST":
+        equip = request.POST.get('id')
+        equipment = get_object_or_404(EquipmentInstance, pk=equip)
+        if equipment.is_available == False and equipment.decommisioned == False :
+            try:
+                issue_request = IssueRequest(equipment = equipment, user = request.user, is_active=True)
+                issue_request.save()
+                ctx = { 'noti' : True,}
+                return HttpResponse(json.dumps(ctx), content_type='application/json')
+            except IntegrityError:
+                ctx = { 'noti' : False,}
+                return HttpResponse(json.dumps(ctx), content_type='application/json')
+
+
+
+@login_required(login_url='/')
+def cancel_issue_request(request):
+    """cancel the issue request"""
+    if request.method == "POST":
+            issue_request_pk = request.POST.get('request_pk')
+            issue_request = get_object_or_404(IssueRequest, pk=issue_request_pk)
+            if issue_request.user == request.user :
+                issue_request.delete()
+                ctx = { 'noti' : True,}
+                return HttpResponse(json.dumps(ctx), content_type='application/json')
+            else :
+                ctx = { 'noti' : False,}
+                return HttpResponse(json.dumps(ctx), content_type='application/json')
+
+
+
+@login_required(login_url='/')
 def view_issue_request(request):
     """view all the issue request from newest to oldest"""
     if request.method == "POST":
@@ -189,6 +216,8 @@ def view_issue_request(request):
             issue_requests = IssueRequest.objects.all.order_by('-pk')
             #return render(request,'main/view_issue_request.html',{'issue_requests'=issue_requests})
 
+
+@login_required(login_url='/')
 def add_project(request):
     """ add a project name and its members, permissions to be decided"""
     return handlePopAdd(request, ProjectForm)        
@@ -268,3 +297,15 @@ class MyAdmDataView(FeedDataView):
     token = EquipmentInstanceAdmTable.token
     def get_queryset(self):
         return super(MyAdmDataView, self).get_queryset().filter(decommisioned=False)                             
+
+
+
+class MyIssueView(FeedDataView):
+    token = IssueanceTable.token
+    def get_queryset(self):
+        return super(MyIssueView, self).get_queryset().filter(returned=False)  
+
+class MyAdmIssueView(FeedDataView):
+    token = IssueanceAdmTable.token
+    def get_queryset(self):
+        return super(MyAdmIssueView, self).get_queryset().filter(returned=False)                

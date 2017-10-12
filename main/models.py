@@ -60,6 +60,9 @@ class Issueance(models.Model):
     returned  = models.BooleanField(default = False)
     def __str__(self):
         return self.equipmentInstance.equipment.name+" "+self.equipmentInstance.uid+" for "+self.project.name
+    def get_name(self):
+        return self.equipmentInstance.equipment.name+" "+self.equipmentInstance.uid
+            
 
 class IssueRequest(models.Model):
     equipment = models.ForeignKey(EquipmentInstance, on_delete = models.CASCADE)
