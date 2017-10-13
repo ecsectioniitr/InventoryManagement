@@ -111,13 +111,13 @@ def update_profile(request):
             'userform'  : userform,
             'profileform': profileform
             }   
-            return HttpResponseRedirect(reverse('main:editprofile'), context)
+            return HttpResponseRedirect(reverse('main:search'), context)
         else :
             context = {
             'userform'  : userform,
             'profileform': profileform
             } 
-            return HttpResponseRedirect(reverse('main:editprofile'), context)
+            return HttpResponseRedirect(reverse('main:search'), context)
     else:    
         profile = UserProfile.objects.get(user = request.user)
         userform = UserForm(instance=request.user)
