@@ -15,7 +15,7 @@
         <a href="{% url 'main:search' %}"><h5>Home</h5></a>
         <a href="{% url 'main:profile' request.user.id %}"><h5>My Profile</h5></a>
         <a href="{% url 'main:editprofile' %}"><h5>Edit Profile</h5></a>
-        <a href="{% url 'main:issueances' %}"><h5>Issued Equipments</h5></a>
+        <a href="{% url 'main:issueances' 3 %}"><h5>Issued Equipments</h5></a>
         <a href="{% url 'main:logout' %}"><h5>Logout</h5></a>
     </center>
     <div class="container" style="margin-top: 10px">

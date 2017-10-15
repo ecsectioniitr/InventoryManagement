@@ -73,17 +73,21 @@ def search(request):
     display all items available for no filters """ 
     equipmentInstances = EquipmentInstance.objects.all()
     if UserProfile.objects.get(user=request.user).is_admin == True:
-        equipment = EquipmentInstanceAdmTable() 
+        equipment = EquipmentTable() 
     else:
-        equipment = EquipmentInstanceTable()      
+        equipment = EquipmentTable()      
     return render(request, "main/search.html", {'equipment': equipment, 'equipmentInstances': equipmentInstances})
 
 
 @login_required(login_url='/')
-def all_issues(request):
-    issuetable = IssueanceTable()
+def all_issues(request, id):
+    equipment=get_object_or_404(Equipment, pk=id)
+    print equipment
+    qs = Issueance.objects.filter(equipmentInstance__equipment=equipment)
+    print qs
+    issuetable = IssueanceTable(qs)
     if UserProfile.objects.get(user=request.user).is_admin == True:
-        issuetable = IssueanceAdmTable()
+        issuetable = IssueanceAdmTable(qs)
     return render(request, "main/issues.html", {'issuetable': issuetable})
 
 
@@ -291,7 +295,7 @@ from table.views import FeedDataView
 class MyDataView(FeedDataView):
     token = EquipmentInstanceTable.token
     def get_queryset(self):
-        return super(MyDataView, self).get_queryset().filter(decommisioned=False) 
+        return super(MyDataView, self , id ).get_queryset().filter(decommisioned=False, id=id) 
 
 class MyAdmDataView(FeedDataView):
     token = EquipmentInstanceAdmTable.token
@@ -303,9 +307,11 @@ class MyAdmDataView(FeedDataView):
 class MyIssueView(FeedDataView):
     token = IssueanceTable.token
     def get_queryset(self):
+        print dir(self)
         return super(MyIssueView, self).get_queryset().filter(returned=False)  
 
 class MyAdmIssueView(FeedDataView):
     token = IssueanceAdmTable.token
     def get_queryset(self):
         return super(MyAdmIssueView, self).get_queryset().filter(returned=False)                
+

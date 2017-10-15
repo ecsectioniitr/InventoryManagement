@@ -40,7 +40,7 @@ class Equipment(models.Model):
         return self.name
 
 class EquipmentInstance(models.Model):
-    equipment = models.ForeignKey(Equipment, on_delete = models.CASCADE)
+    equipment = models.ForeignKey(Equipment, on_delete = models.CASCADE, related_name='eqins')
     buying_time = models.DateTimeField(blank=True, null=True)
     is_available = models.BooleanField(default=True)
     remark = models.CharField(max_length=200, blank=True)

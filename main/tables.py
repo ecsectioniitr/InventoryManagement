@@ -5,9 +5,15 @@ from django.core.urlresolvers import reverse_lazy
 from django.utils.html import format_html
 from django.core.urlresolvers import reverse
 
+
 class IssueColumn(Column):
     def render(self, value):
-            return format_html('<span id = "{}-user"></span>', value.id)
+        return format_html('<span id = "{}-user"></span>', value.id)
+
+
+class FollowColumn(Column):
+    def render(self, value):
+        return format_html('<input type="button" id="{}-return" name="{}" value="Follow" onclick="returnequip(this.name)" />', value.id , value.id )              
 
 class AdmColumn(Column):
     def render(self, value):
@@ -30,25 +36,40 @@ class ProfileColumn(Column):
             f = value.issued_by.id
             name = value.issued_by.username
             value = reverse('main:profile', kwargs={'id':f})
-            return format_html('<a target="_blank" href = "{}">{}</a>', value, name )                
+            return format_html('<a target="_blank" href = "{}">{}</a>', value, name )
+
+class AvailableColumn(Column):
+    def render(self, value):
+        return value.eqins.filter(is_available=True, decommisioned=False).count()                           
          
 
 
 class EquipmentInstanceTable(Table):
-    id = Column(field='id', header=u'id')
     equipment = Column(field='equipment.name', header=u'Equipment Type')
     uid = Column(field='uid', header=u'UID')
     remark = Column(field='remark', header=u'Remark')
     is_available = CheckboxColumn(field='is_available', sortable=True, header=u'Availability')
     issue = IssueColumn(field='id', header=u'Request', searchable=False, sortable=False)
-
-
+    
     class Meta:
         model = EquipmentInstance
         ajax = True
         search = True
         ajax_source = reverse_lazy('table_data')
-        sort = [(4, 'desc')]
+        sort = [(4, 'desc')]   
+   
+
+
+class EquipmentTable(Table):
+    equipment = Column(field='name', header=u'Equipment Type')
+    no_available = AvailableColumn(header=u'Available', searchable=False, sortable=False)
+    follow = FollowColumn(field='id', header=u'Follow', searchable=False, sortable=False)
+
+
+    class Meta:
+        model = Equipment
+        ajax = True
+        search = True       
 
 
 class EquipmentInstanceAdmTable(Table):
@@ -70,7 +91,6 @@ class EquipmentInstanceAdmTable(Table):
 
 
 class IssueanceTable(Table):
-    equipmentInstanceid = Column(field='equipmentInstance.id', header=u'Equipment Id')
     equipmentInstance = Column(field='equipmentInstance.equipment.name', header=u'Equipment Type')
     equipmentInstanceuid =Column(field='equipmentInstance.uid', header=u'Equipment Uid') 
     issued_by = ProfileColumn(field='id', header=u'Issued By', searchable=False, sortable=False)
@@ -80,13 +100,12 @@ class IssueanceTable(Table):
 
     class Meta:
         model = Issueance
-        ajax = True
+        ajax = False
         search = True
         ajax_source = reverse_lazy('issuetable_data')
 
 
 class IssueanceAdmTable(Table):
-    equipmentInstanceid = Column(field='equipmentInstance.id', header=u'Equipment Id')
     equipmentInstance = Column(field='equipmentInstance.equipment.name', header=u'Equipment Type')
     equipmentInstanceuid =Column(field='equipmentInstance.uid', header=u'Equipment Uid') 
     issued_by = ProfileColumn(field='id', header=u'Issued By', searchable=False, sortable=False)

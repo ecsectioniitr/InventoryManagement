@@ -21,6 +21,6 @@ urlpatterns = [
     url(r'^return/$', views.return_equipment, name='return'),
     url(r'^cancelrequest/$', views.cancel_issue_request, name='cancelrequest'),
     url(r'^viewrequest/$', views.view_issue_request, name='viewrequest'),
-    url(r'^issueances/$', views.all_issues, name='issueances'),
+    url(r'^issueances/(?P<id>[0-9]+)/$', views.all_issues, name='issueances'),
     
 ]
