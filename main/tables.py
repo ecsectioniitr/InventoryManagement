@@ -68,7 +68,7 @@ class EquipmentInstanceTable(Table):
     uid = Column(field='uid', header=u'UID')
     remark = Column(field='remark', header=u'Remark')
     is_available = CheckboxColumn(field='is_available', sortable=True, header=u'Availability')
-    issued_by  = ProfileColumn1(field='id', header=u'Issued By', searchable=False, sortable=False)
+    issued_by  = ProfileColumn1( header=u'Issued By', searchable=True, sortable=True)
     
     class Meta:
         model = EquipmentInstance
