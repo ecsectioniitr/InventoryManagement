@@ -13,6 +13,7 @@ urlpatterns = [
     url(r'^activate/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$',
         views.activate, name='activate'),
     url(r'^search/$', views.search, name='search'),
+    url(r'^search/(?P<id>[0-9]+)/$', views.instance_search, name='instancesearch'),
     url(r'^addproject/$', views.add_project, name='addproject'),
     url(r'^profile/(?P<id>[0-9]+)/$', views.profile, name='profile'),
     url(r'^editprofile/$', views.update_profile, name='editprofile'),

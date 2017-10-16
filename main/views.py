@@ -80,11 +80,23 @@ def search(request):
 
 
 @login_required(login_url='/')
+def instance_search(request, id):
+    """for searching different items available depending on get request,
+    display all items available for no filters """ 
+    equipmentInstances = EquipmentInstance.objects.all()
+    equipment=get_object_or_404(Equipment, pk=id)
+    qs = equipment.eqins.filter(decommisioned=False)
+    if UserProfile.objects.get(user=request.user).is_admin == True:
+        equipment = EquipmentInstanceTable(qs) 
+    else:
+        equipment = EquipmentInstanceTable(qs)      
+    return render(request, "main/search.html", {'equipment': equipment, 'equipmentInstances': equipmentInstances})    
+
+
+@login_required(login_url='/')
 def all_issues(request, id):
     equipment=get_object_or_404(Equipment, pk=id)
-    print equipment
     qs = Issueance.objects.filter(equipmentInstance__equipment=equipment)
-    print qs
     issuetable = IssueanceTable(qs)
     if UserProfile.objects.get(user=request.user).is_admin == True:
         issuetable = IssueanceAdmTable(qs)
@@ -295,7 +307,7 @@ from table.views import FeedDataView
 class MyDataView(FeedDataView):
     token = EquipmentInstanceTable.token
     def get_queryset(self):
-        return super(MyDataView, self , id ).get_queryset().filter(decommisioned=False, id=id) 
+        return super(MyDataView, self ).get_queryset().filter(decommisioned=False) 
 
 class MyAdmDataView(FeedDataView):
     token = EquipmentInstanceAdmTable.token
