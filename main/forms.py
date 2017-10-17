@@ -38,6 +38,8 @@ class RelatedFieldWidgetCanAdd(widgets.Select):
 
 
 
+
+
 class SignupForm(UserCreationForm):
     email = forms.EmailField(max_length=200, help_text='Required')
     first_name = forms.CharField(required=True, label="First Name")
@@ -85,4 +87,21 @@ class IssueanceForm(forms.ModelForm):
                     'issued_by' :autocomplete.ModelSelect2(url='user-autocomplete') }                        
           
 
+class PostForm(forms.Form):
+    project = forms.ModelChoiceField(
+        label='Project',
+        required=True,
+       queryset=Project.objects.all(),
+       widget=RelatedFieldWidgetCanAdd(Project, related_url="addproject"))
+    time = forms.IntegerField(label='Time(Weeks)')   
+    equipments = forms.ModelMultipleChoiceField( label='Equipments',
+        required=True,
+        queryset=EquipmentInstance.objects.filter(is_available=True),
+        widget=autocomplete.ModelSelect2Multiple(url='equipment-autocomplete', attrs={'data-html': True}),
+    )
+
+    def __init__(self, user, *args, **kwargs):
+        super(PostForm, self).__init__(*args, **kwargs)
+        self.fields['project'].queryset = user.project_set.all()
+    
 

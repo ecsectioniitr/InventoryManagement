@@ -10,18 +10,18 @@
 </head>
 <body>
   <center>
-        <a href="{% url 'main:index' %}"><h5>Home</h5></a>
-        {% if not request.user.userprofile.is_admin %}<a href="{% url 'main:profile' request.user.id %}"><h5>My Profile</h5></a>{% endif %}
-       {% if not request.user.userprofile.is_admin %} <a href="{% url 'main:editprofile' %}"><h5>Edit Profile</h5></a>{% endif %}
         <a href="{% url 'main:search' %}"><h5>View Inventory</h5></a>
         <a href="{% url 'main:allissueance'  %}"><h5>Issued Equipments</h5></a>
         <a href="{% url 'main:logout' %}"><h5>Logout</h5></a>
       </center>
   <div class="container">
+<form action="{% url 'main:admprofile' %}" >
+  <label for="exampleInputEmail1">Enrollment No.</label>
+            <input type="number"   name="enrollment_no">
+            <input type = "submit">
+</form>
     <br>
-    {% block content %}{% endblock content %}
   </div>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-  {% block script %}{% endblock script %}
 </body>
 </html> 

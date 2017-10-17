@@ -36,6 +36,7 @@ class Project(models.Model):
 class Equipment(models.Model):
     name = models.CharField(max_length=100)
     price =  models.FloatField()
+    followers = models.ManyToManyField(User, through='Follow', blank=True)
     def __str__(self):
         return self.name
 
@@ -46,12 +47,12 @@ class EquipmentInstance(models.Model):
     remark = models.CharField(max_length=200, blank=True)
     decommisioned = models.BooleanField(default=False)
     uid = models.CharField(max_length=50, unique=True, blank=True)
-    issuerq = models.ManyToManyField(User, through='IssueRequest', blank=True)
     def __str__(self):
         return self.equipment.name+" "+self.uid
 
 class Issueance(models.Model):
     issued_by = models.ForeignKey(User, on_delete=models.SET_NULL, null = True)
+    enrollment_no = models.IntegerField()
     project = models.ForeignKey(Project, on_delete=models.SET_NULL, null = True)
     equipmentInstance = models.ForeignKey(EquipmentInstance, on_delete=models.CASCADE)
     year = models.IntegerField()
@@ -64,15 +65,15 @@ class Issueance(models.Model):
         return self.equipmentInstance.equipment.name+" "+self.equipmentInstance.uid
             
 
-class IssueRequest(models.Model):
-    equipment = models.ForeignKey(EquipmentInstance, on_delete = models.CASCADE)
-    user = models.ForeignKey(User, on_delete = models.CASCADE, related_name="issuerq")
+class Follow(models.Model):
+    equipment = models.ForeignKey(Equipment, on_delete = models.CASCADE)
+    user = models.ForeignKey(User, on_delete = models.CASCADE, related_name="follow")
     created_on = models.DateTimeField(auto_now_add=True)
     is_active = models.BooleanField(default=True)    
     class Meta:
         unique_together = (('equipment', 'user'),)
     def __str__(self):
-        return self.equipment.equipment.name+" "+self.equipment.uid+" by "+self.user.username   
+        return self.equipment.name+" by "+self.user.username   
 
 
 

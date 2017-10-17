@@ -5,34 +5,38 @@
     {% load static %}
     {% load table_tags %}
     <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-    <title>Equipments</title>
+    <title>Issued Equipments</title>
     <link href="{% static 'table/css/bootstrap.min.css' %}" rel="stylesheet">
     <script src="{% static 'table/js/jquery.min.js' %}"></script>
     <script src="{% static 'table/js/bootstrap.min.js' %}"></script>
 </head>
 <body>
-    <center>
+  <center>
         <a href="{% url 'main:index' %}"><h5>Home</h5></a>
-        {% if not request.user.userprofile.is_admin %} <a href="{% url 'main:profile' request.user.id %}"><h5>My Profile</h5></a>{% endif %}
+       {% if not request.user.userprofile.is_admin %} <a href="{% url 'main:profile' request.user.id %}"><h5>My Profile</h5></a>{% endif %}
        {% if not request.user.userprofile.is_admin %} <a href="{% url 'main:editprofile' %}"><h5>Edit Profile</h5></a>{% endif %}
         <a href="{% url 'main:search' %}"><h5>View Inventory</h5></a>
         <a href="{% url 'main:allissueance'  %}"><h5>Issued Equipments</h5></a>
         <a href="{% url 'main:logout' %}"><h5>Logout</h5></a>
     </center>
-
     <div class="container" style="margin-top: 10px">
-        <h1>Equipments</h1>
+        <h1>{{ equipment.name }}</h1>
+        {% if not request.user.userprofile.is_admin %}
+        {% if request.user in equipment.followers.all %}
+        <input type="button"  name={{ equipment.id }} value="Unfollow" onclick="cancelfollow(this.name)" />
+        {% else %}
+    <input type="button"  name={{ equipment.id }} value="Follow" onclick="follow(this.name)" />
+    {% endif %}
+    {% endif %}
         <br />
-        {% render_table equipment %}
+        {% render_table equipmenttable %}
 
        
     </div>
-    <br><br>
+    
 
 
     <script>
-
-
 
 
 function cancelfollow(name){
@@ -67,16 +71,5 @@ function follow(name){
           }); 
     }        
 </script>
-<script type="text/javascript">
-    
- {% for equipment in equipments %}
-                {% if request.user in equipment.followers.all %}
-                    setTimeout(function () {$('#'+{{ equipment.id }}+'-user').html( '<input type="button"  name="'+{{equipment.id }}+'" value="Unfollow" onclick="cancelfollow(this.name)" />' );}, 1000)
-                
-                {% else %}
-                     setTimeout(function () {$('#'+{{ equipment.id }}+'-user').html( '<input type="button"  name="'+{{equipment.id }}+'" value="Follow" onclick="follow(this.name)" />' );}, 1000)
-                {% endif %}
-        {% endfor %} 
-        </script>
 </body>
 </html>

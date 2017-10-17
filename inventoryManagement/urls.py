@@ -30,15 +30,21 @@ urlpatterns = [
         name='user-autocomplete',
     ),
     url(
-        r'^user-autocomplete/$',
+        r'^project-autocomplete/$',
         ProjectAutocomplete.as_view(),
         name='project-autocomplete',
+    ),
+    url(
+        r'^equipment-autocomplete/$',
+        EquipmentAutocomplete.as_view(),
+        name='equipment-autocomplete',
     ),
     url(r'^addproject/$', add_project, name='addproject'),
     url(r'^table/data/$', MyDataView.as_view(), name='table_data'),
     url(r'^table/admdata/$', MyAdmDataView.as_view(), name='admtable_data'),
     url(r'^table/issuedata/$', MyIssueView.as_view(), name='issuetable_data'),
     url(r'^table/admissuedata/$', MyAdmIssueView.as_view(), name='admissuetable_data'),
+    url(r'^table/myfollowdata/$', MyFollowView.as_view(), name='myfollowtable_data'),
     
 ]
 

@@ -21,7 +21,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = '!+wdd&qf_2yp3eqh5w5kkuv(zshgj^0yh5$coam^5i3+vzvp!9'
-LOGIN_REDIRECT_URL = 'main:search'
+LOGIN_REDIRECT_URL = 'main:index'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True

@@ -12,17 +12,35 @@
 </head>
 <body>
   <center>
-        <a href="{% url 'main:index' %}"><h5>Home</h5></a>
-        <a href="{% url 'main:profile' request.user.id %}"><h5>My Profile</h5></a>
-        <a href="{% url 'main:editprofile' %}"><h5>Edit Profile</h5></a>
         <a href="{% url 'main:search' %}"><h5>View Inventory</h5></a>
+        <a href="{% url 'main:editprofile' %}"><h5>Edit Profile</h5></a>
+
         <a href="{% url 'main:allissueance'  %}"><h5>Issued Equipments</h5></a>
         <a href="{% url 'main:logout' %}"><h5>Logout</h5></a>
     </center>
     <div class="container" style="margin-top: 10px">
-        <h1>Issued Equipments</h1>
+    	<h3>My profile</h3>
+    		<center>
+    <h6>{{ reuqest.user.username }}</h6>
+    <h6>{{ request.user.first_name }} {{ request.user.last_name }}</h6>
+    <h6> {{ request.user.email }}</h6>
+    <br><br>
+    <ul>
+    	{% if request.user.userprofile.enrollment_no %}<li>Enrollment No.: {{ request.user.userprofile.enrollment_no }}</li>{% endif %}
+    	{% if request.user.userprofile.branch %}<li> Branch : {{ request.user.userprofile.branch }}</li>{% endif %}
+    	{% if request.user.userprofile.year %}<li>Year : {{ request.user.userprofile.year }} </li>{% endif %}
+    </ul>
+    <br>
+</center>
+
+        <h3>My Issued Equipments</h3>
         <br />
         {% render_table issuetable %}
+        <br><br><br>
+        <h3>Recently Following</h3>
+        <br />
+        {% render_table followtable %}
+
 
        
     </div>
@@ -32,12 +50,12 @@
     <script>
 
 
-function returnequip(name){
+function cancelfollow(name){
         console.log(name);
       $.ajax({
                type: "POST",
-               url: "{% url 'main:return' %}",
-               data: {'Issueance_pk': name, 'csrfmiddlewaretoken': '{{ csrf_token }}'},
+               url: "{% url 'main:cancelfollow' %}",
+               data: {'request_pk': name, 'csrfmiddlewaretoken': '{{ csrf_token }}'},
                dataType: "json",
                success: function(response) {
                    location.reload();

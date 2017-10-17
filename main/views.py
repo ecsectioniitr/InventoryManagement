@@ -51,7 +51,6 @@ def signup(request):
 
 
 
-
 def activate(request, uidb64, token):
     try:
         uid = force_text(urlsafe_base64_decode(uidb64))
@@ -67,34 +66,42 @@ def activate(request, uidb64, token):
     else:
         return HttpResponse('Activation link is invalid!')
 
+
+@login_required(login_url='/')
+def index(request):
+    if UserProfile.objects.get(user=request.user).is_admin == True:
+        return render(request, 'main/index_admin.html')
+    issuetable = MyIssueanceTable()
+    followtable = MyFollowTable()
+    return render(request, 'main/index.html', {'issuetable': issuetable, 'followtable': followtable})        
+
 @login_required(login_url='/')
 def search(request):
     """for searching different items available depending on get request,
     display all items available for no filters """ 
-    equipmentInstances = EquipmentInstance.objects.all()
+    equipments = Equipment.objects.all()
     if UserProfile.objects.get(user=request.user).is_admin == True:
-        equipment = EquipmentTable() 
+        equipment = EquipmentAdmTable() 
     else:
         equipment = EquipmentTable()      
-    return render(request, "main/search.html", {'equipment': equipment, 'equipmentInstances': equipmentInstances})
+    return render(request, "main/search.html", {'equipment': equipment, 'equipments': equipments})
 
 
 @login_required(login_url='/')
 def instance_search(request, id):
     """for searching different items available depending on get request,
     display all items available for no filters """ 
-    equipmentInstances = EquipmentInstance.objects.all()
     equipment=get_object_or_404(Equipment, pk=id)
     qs = equipment.eqins.filter(decommisioned=False)
     if UserProfile.objects.get(user=request.user).is_admin == True:
-        equipment = EquipmentInstanceTable(qs) 
+        equipmenttable = EquipmentInstanceTable(qs) 
     else:
-        equipment = EquipmentInstanceTable(qs)      
-    return render(request, "main/search.html", {'equipment': equipment, 'equipmentInstances': equipmentInstances})    
+        equipmenttable = EquipmentInstanceTable(qs)      
+    return render(request, "main/searchinstance.html", {'equipment': equipment, 'equipmenttable': equipmenttable})    
 
 
 @login_required(login_url='/')
-def all_issues(request, id):
+def issues(request, id):
     equipment=get_object_or_404(Equipment, pk=id)
     qs = Issueance.objects.filter(equipmentInstance__equipment=equipment)
     issuetable = IssueanceTable(qs)
@@ -102,12 +109,35 @@ def all_issues(request, id):
         issuetable = IssueanceAdmTable(qs)
     return render(request, "main/issues.html", {'issuetable': issuetable})
 
+def all_issues(request):
+    equipments=Equipment.objects.all()
+    qs = []
+    for equipment in equipments :
+        if equipment.eqins.filter(is_available=False, decommisioned=False).count() != 0:
+            qs.append(equipment)
+    issuetable = EquipmentIssueTable(qs)
+    if UserProfile.objects.get(user=request.user).is_admin == True:
+        issuetable = EquipmentIssueTable(qs)
+    return render(request, "main/issues.html", {'issuetable': issuetable})    
+
 
 @login_required(login_url='/')
 def profile(request, id):
     user  = get_object_or_404(User, pk=id)
     userprofile = get_object_or_404(UserProfile, user=user)
     return render(request, "main/profile.html", {'userp': user, 'userprofile': userprofile})
+
+
+@login_required(login_url='/')
+def admprofile(request):
+    if UserProfile.objects.get(user=request.user).is_admin == False:
+        return HttpResponse('You cannot access this page')       
+    userprofile  = get_object_or_404(UserProfile, enrollment_no=request.GET.get('enrollment_no'))
+    user = userprofile.user
+    qs = Issueance.objects.filter(issued_by=user, returned=False) 
+    issuetable = IssueanceAdmTable(qs)
+    form = PostForm(user)
+    return render(request, "main/profile_adm.html", {'userp': user, 'userprofile': userprofile, 'issuetable':issuetable, 'form':form })    
 
 
 @login_required(login_url='/')
@@ -147,25 +177,28 @@ def update_profile(request):
 
 @login_required(login_url='/')
 def issue(request, issue_id):
-    form = IssueanceForm()
+    if UserProfile.objects.get(user=request.user).is_admin == False:
+        return HttpResponse('You dont have required permissions to issue the equipment') 
+    user = get_object_or_404(User, pk=issue_id)
+    form = PostForm(user)
     if request.method == "POST":
         if UserProfile.objects.get(user=request.user).is_admin == True:
-            form = IssueanceForm(request.POST)
+            user = get_object_or_404(User, pk=issue_id)
+            form = PostForm(user, request.POST)
             if form.is_valid():
-                equip = get_object_or_404(EquipmentInstance, pk=issue_id)
-                if equip.is_available:
-                    issue = form.save(commit = False)
-                    issue.equipmentInstance = equip
-                    issue.save()
-                    equip.is_available = False
-                    equip.save()
-                    return HttpResponseRedirect(reverse('main:search'))
-                else:
-                    return HttpResponse('Equipment already issued')
-                        
+                user = get_object_or_404(User, pk=issue_id)
+                time = form.cleaned_data['time']
+                project = form.cleaned_data['project']
+                for equipment in form.cleaned_data['equipments']:
+                    Issueance.objects.create(issued_by=user, project=project, equipmentInstance=equipment, year=time,
+                     enrollment_no = user.userprofile.enrollment_no )
+                response = redirect('main:admprofile')
+                response['Location'] += '?enrollment_no=%d' % user.userprofile.enrollment_no
+                return response    
+
         else:
-            return HttpResponse('You dont have required permissions to issue the equipment')        
-    return render(request, "main/issue.html", {'form': form})                    
+            return HttpResponse('You dont have required permissions to issue the equipment') 
+    return render(request, 'main/issue.html', {'form': form})
         
 
 @login_required(login_url='/')
@@ -191,46 +224,37 @@ def return_equipment(request):
 
 
 @login_required(login_url='/')
-def issue_request(request):
+def follow(request):
     """ generate a issue request for items unavailable """
     if request.method == "POST":
         equip = request.POST.get('id')
-        equipment = get_object_or_404(EquipmentInstance, pk=equip)
-        if equipment.is_available == False and equipment.decommisioned == False :
-            try:
-                issue_request = IssueRequest(equipment = equipment, user = request.user, is_active=True)
-                issue_request.save()
-                ctx = { 'noti' : True,}
-                return HttpResponse(json.dumps(ctx), content_type='application/json')
-            except IntegrityError:
-                ctx = { 'noti' : False,}
-                return HttpResponse(json.dumps(ctx), content_type='application/json')
+        equipment = get_object_or_404(Equipment, pk=equip)
+        try:
+            follow = Follow(equipment = equipment, user = request.user, is_active=True)
+            follow.save()
+            ctx = { 'noti' : True,}
+            return HttpResponse(json.dumps(ctx), content_type='application/json')
+        except IntegrityError:
+            ctx = { 'noti' : False,}
+            return HttpResponse(json.dumps(ctx), content_type='application/json')
 
 
 
 @login_required(login_url='/')
-def cancel_issue_request(request):
+def cancel_follow(request):
     """cancel the issue request"""
     if request.method == "POST":
-            issue_request_pk = request.POST.get('request_pk')
-            issue_request = get_object_or_404(IssueRequest, pk=issue_request_pk)
-            if issue_request.user == request.user :
-                issue_request.delete()
+            follow_pk = request.POST.get('request_pk')
+            equipment = get_object_or_404(Equipment, pk=follow_pk)
+            follow = get_object_or_404(Follow, equipment=equipment, user =request.user )
+            if follow.user == request.user :
+                follow.delete()
                 ctx = { 'noti' : True,}
                 return HttpResponse(json.dumps(ctx), content_type='application/json')
             else :
                 ctx = { 'noti' : False,}
                 return HttpResponse(json.dumps(ctx), content_type='application/json')
 
-
-
-@login_required(login_url='/')
-def view_issue_request(request):
-    """view all the issue request from newest to oldest"""
-    if request.method == "POST":
-        if UserProfile.objects.get(user=request.user.username).is_admin == True:
-            issue_requests = IssueRequest.objects.all.order_by('-pk')
-            #return render(request,'main/view_issue_request.html',{'issue_requests'=issue_requests})
 
 
 @login_required(login_url='/')
@@ -259,13 +283,9 @@ class MyCronJob(CronJobBase):
 
 class UserAutocomplete(autocomplete.Select2QuerySetView):
     def get_queryset(self):
-        query = UserProfile.objects.all()
-        qs = []
-        for userp in query:
-            qs.append(userp.user)
-
+        qs = User.objects.all()
         if self.q:
-            qs = qs.filter( Q(first_name__icontains = term) | Q(last_name__icontains = term)  | Q(username__icontains = term))
+            qs = qs.filter( Q(first_name__icontains = self.q) | Q(last_name__icontains = self.q)  | Q(username__icontains = self.q))
         return qs
 
 
@@ -274,8 +294,16 @@ class ProjectAutocomplete(autocomplete.Select2QuerySetView):
         qs = Project.objects.all()
 
         if self.q:
-            qs = qs.filter( Q(name__icontains = term) | Q(name__contains = term))
+            qs = qs.filter( Q(name__icontains = self.q) | Q(name__contains = self.q))
         return qs
+
+class EquipmentAutocomplete(autocomplete.Select2QuerySetView):
+    def get_queryset(self):
+        qs = EquipmentInstance.objects.filter(is_available=True)
+
+        if self.q:
+            qs = qs.filter( Q(uid__icontains = self.q) | Q(equipment__name__contains = self.q))
+        return qs        
 
 
 
@@ -317,13 +345,27 @@ class MyAdmDataView(FeedDataView):
 
 
 class MyIssueView(FeedDataView):
-    token = IssueanceTable.token
+    token = MyIssueanceTable.token
     def get_queryset(self):
-        print dir(self)
-        return super(MyIssueView, self).get_queryset().filter(returned=False)  
+        return super(MyIssueView, self).get_queryset().filter(issued_by=self.request.user)  
 
 class MyAdmIssueView(FeedDataView):
     token = IssueanceAdmTable.token
     def get_queryset(self):
-        return super(MyAdmIssueView, self).get_queryset().filter(returned=False)                
+        return super(MyAdmIssueView, self).get_queryset().filter(returned=False) 
 
+
+class MyFollowView(FeedDataView):
+    token = MyFollowTable.token
+    def get_queryset(self):
+        return super(MyFollowView, self).get_queryset().filter(user=self.request.user)                       
+
+
+
+
+#for skill in form.cleaned_data['requirements']:
+
+"""response = redirect('url-name', x)
+response['Location'] += '?your=querystring'
+return response
+"""
