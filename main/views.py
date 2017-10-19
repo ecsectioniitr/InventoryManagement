@@ -192,6 +192,7 @@ def issue(request, issue_id):
                 for equipment in form.cleaned_data['equipments']:
                     Issueance.objects.create(issued_by=user, project=project, equipmentInstance=equipment, year=time,
                      enrollment_no = user.userprofile.enrollment_no )
+                    equipment.is_available=False
                 response = redirect('main:admprofile')
                 response['Location'] += '?enrollment_no=%d' % user.userprofile.enrollment_no
                 return response    
