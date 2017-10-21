@@ -272,21 +272,8 @@ def add_project(request):
     
 
 
-"""
-class MyCronJob(CronJobBase):
-    RUN_EVERY_MINS = 720 #runs once every 12 hours
-    schedule = Schedule(run_every_mins = RUN_EVERY_MINS)
-    code = "main.my_cron_job"
-    def do(self):
-        user = request.user.username
-        issueance = Issueance.objects.filter(issued_by = user)
-        if issueance.return_date <= datetime.datetime.now():
-            message = "your issuance period has exceeded, please return the equipment"
-        else:
-            message = " ";
-        pass
 
-"""
+
 
 class UserAutocomplete(autocomplete.Select2QuerySetView):
     def get_queryset(self):
@@ -335,7 +322,6 @@ def handlePopAdd(request, addForm):
 
 
 
-    # views.py
 from table.views import FeedDataView
 
 
@@ -370,9 +356,3 @@ class MyFollowView(FeedDataView):
 
 
 
-#for skill in form.cleaned_data['requirements']:
-
-"""response = redirect('url-name', x)
-response['Location'] += '?your=querystring'
-return response
-"""
