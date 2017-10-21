@@ -34,6 +34,7 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = [
     'main.apps.MainConfig',
     'table',
+    'notify',
     'dal',
     'dal_select2',
     'django_cron',

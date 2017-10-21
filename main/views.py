@@ -190,9 +190,10 @@ def issue(request, issue_id):
                 time = form.cleaned_data['time']
                 project = form.cleaned_data['project']
                 for equipment in form.cleaned_data['equipments']:
-                    Issueance.objects.create(issued_by=user, project=project, equipmentInstance=equipment, year=time,
-                     enrollment_no = user.userprofile.enrollment_no )
-                    equipment.is_available=False
+                    if  equipment.is_available:
+                        Issueance.objects.create(issued_by=user, project=project, equipmentInstance=equipment, year=time,
+                        enrollment_no = user.userprofile.enrollment_no )
+                        equipment.is_available=False
                 response = redirect('main:admprofile')
                 response['Location'] += '?enrollment_no=%d' % user.userprofile.enrollment_no
                 return response    
@@ -215,6 +216,9 @@ def return_equipment(request):
             equipment.is_available=True
             issue.save()
             equipment.save()
+            followers = list(equipment.equipment.followers.all())
+            notify.send(request.user, recipient_list=followers, actor=equipment,
+                        verb='is available now!.',)
 
 
             notification = "equipment returned"

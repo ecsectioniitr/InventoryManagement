@@ -23,6 +23,7 @@ from main.views import *
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^table/', include('table.urls')),
+    url(r'^notifications/', include('notify.urls', 'notifications')),
     url(r'^', include('main.urls')),
     url(
         r'^user-autocomplete/$',
