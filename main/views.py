@@ -16,6 +16,7 @@ from .tables import *
 from .models import *
 from django_cron import CronJobBase, Schedule
 import datetime
+from notify.signals import notify
 from dal import autocomplete
 from django.db.models import Q
 from django.utils import timezone

@@ -4,6 +4,8 @@
 <head>
     {% load static %}
     {% load table_tags %}
+    {% load notification_tags %}
+    {% include_notify_js_variables %}
     <meta http-equiv="content-type" content="text/html; charset=utf-8" />
     <title>Issued Equipments</title>
     <link href="{% static 'table/css/bootstrap.min.css' %}" rel="stylesheet">
@@ -18,6 +20,15 @@
 
         <a href="{% url 'main:allissueance'  %}"><h5>Issued Equipments</h5></a>
         <a href="{% url 'main:logout' %}"><h5>Logout</h5></a>
+    
+    <br><br>
+    <div class="dropdown">
+        <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Notifications
+  <span class="caret"></span></button>
+  <ul class=" notification-box-list dropdown-menu">
+    {% user_notifications %}
+</ul>
+    </div>
     </center>
     <div class="container" style="margin-top: 10px">
     	<h3>My profile</h3>
