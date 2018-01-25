@@ -14,7 +14,6 @@ from django.core.mail import EmailMessage
 from .forms import *
 from .tables import *
 from .models import *
-from django_cron import CronJobBase, Schedule
 import datetime
 from notify.signals import notify
 from dal import autocomplete
@@ -221,8 +220,6 @@ def return_equipment(request):
             followers = list(equipment.equipment.followers.all())
             notify.send(request.user, recipient_list=followers, actor=equipment,
                         verb='is available now!.',)
-
-
             notification = "equipment returned"
             ctx = { 'noti' : True,}
             return HttpResponse(json.dumps(ctx), content_type='application/json')

@@ -43,7 +43,7 @@ function cancelfollow(name){
                data: {'request_pk': name, 'csrfmiddlewaretoken': '{{ csrf_token }}'},
                dataType: "json",
                success: function(response) {
-                   location.reload()
+                   location.reload();
                 },
                 error: function(rs, e) {
                        alert(rs.responseText);

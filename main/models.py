@@ -1,5 +1,4 @@
 from __future__ import unicode_literals
-
 from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
@@ -58,7 +57,7 @@ class Issueance(models.Model):
     enrollment_no = models.IntegerField()
     project = models.ForeignKey(Project, on_delete=models.SET_NULL, null = True)
     equipmentInstance = models.ForeignKey(EquipmentInstance, on_delete=models.CASCADE)
-    year = models.IntegerField()
+    year = models.IntegerField() #time of issueance
     issued_on = models.DateTimeField(auto_now_add=True)
     return_date = models.DateTimeField(auto_now_add = True)
     returned  = models.BooleanField(default = False)

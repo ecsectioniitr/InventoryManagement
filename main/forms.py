@@ -93,7 +93,7 @@ class PostForm(forms.Form):
         required=True,
        queryset=Project.objects.all(),
        widget=RelatedFieldWidgetCanAdd(Project, related_url="addproject"))
-    time = forms.IntegerField(label='Time(Weeks)')   
+    time = forms.IntegerField(label='Time(days)')   
     equipments = forms.ModelMultipleChoiceField( label='Equipments',
         required=True,
         queryset=EquipmentInstance.objects.filter(is_available=True),

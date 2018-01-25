@@ -32,12 +32,12 @@ ALLOWED_HOSTS = ['*']
 # Application definition
 
 INSTALLED_APPS = [
+    'django_cron',
     'main.apps.MainConfig',
     'table',
     'notify',
     'dal',
     'dal_select2',
-    'django_cron',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -46,9 +46,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 ]
 
-CRON_CLASSES = [
-    'main.cron.MyCronJob',
-]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -58,6 +55,11 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+]
+
+CRON_CLASSES = [
+    "main.cron.MyCronJob",
+    # ...
 ]
 
 ROOT_URLCONF = 'inventoryManagement.urls'

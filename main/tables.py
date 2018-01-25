@@ -90,7 +90,7 @@ class MyIssueanceTable(Table):
     equipmentInstanceuid =Column(field='equipmentInstance.uid', header=u'Equipment Uid') 
     project = Column(field='project.name', header=u'Project')
     issued_on = DatetimeColumn(field='issued_on', header=u'Issued On')
-    year = Column(field='year', header=u'Time(weeks)')
+    year = Column(field='year', header=u'Time(days)')
     returned = Column(field='returned', header=u'Returned')
 
     class Meta:
@@ -106,7 +106,7 @@ class IssueanceAdmTable(Table):
     project = Column(field='project.name', header=u'Project')
     issued_by = ProfileColumn(field='id', header=u'Issued By', searchable=False, sortable=False)
     issued_on = DatetimeColumn(field='issued_on', header=u'Issued On')
-    year = Column(field='year', header=u'Time(weeks)')
+    year = Column(field='year', header=u'Time(days)')
     issue = ReturnColumn(field='id', header=u'Return', searchable=False, sortable=False)
 
     class Meta:
@@ -166,7 +166,7 @@ class IssueanceTable(Table):
     issued_by = ProfileColumn(field='id', header=u'Issued By', searchable=False, sortable=False)
     project = Column(field='project.name', header=u'Equipment')
     issued_on = DatetimeColumn(field='issued_on', header=u'Issued On')
-    year = Column(field='year', header=u'Time(weeks)')
+    year = Column(field='year', header=u'Time(days)')
 
     class Meta:
         model = Issueance
