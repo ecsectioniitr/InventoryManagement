@@ -14,7 +14,7 @@ class IssueColumn(Column):
 
 class FollowColumn(Column):
     def render(self, value):
-        return format_html('<span id = "{}-user"></span>', value.id)                 
+        return format_html('<span id = "{}-user"></span><script>hello();</script>', value.id)                 
 
             
 

@@ -9,6 +9,22 @@
     <link href="{% static 'table/css/bootstrap.min.css' %}" rel="stylesheet">
     <script src="{% static 'table/js/jquery.min.js' %}"></script>
     <script src="{% static 'table/js/bootstrap.min.js' %}"></script>
+    <script type="text/javascript">
+ function hello() {
+        
+ {% for equipment in equipments %}
+                {% if request.user in equipment.followers.all %}
+                    $('#'+{{ equipment.id }}+'-user').html( '<input type="button"  name="'+{{equipment.id }}+'" value="Unfollow" onclick="cancelfollow(this.name)" />' );
+                    console.log({{ equipment.id }});
+                
+                {% else %}
+                      $('#'+{{ equipment.id }}+'-user').html( '<input type="button"  name="'+{{equipment.id }}+'" value="Follow" onclick="follow(this.name)" />' );
+                {% endif %}
+{% endfor %} 
+
+};
+</script>
+
 </head>
 <body>
     <center>
@@ -67,16 +83,7 @@ function follow(name){
           }); 
     }        
 </script>
-<script type="text/javascript">
-    
- {% for equipment in equipments %}
-                {% if request.user in equipment.followers.all %}
-                    setTimeout(function () {$('#'+{{ equipment.id }}+'-user').html( '<input type="button"  name="'+{{equipment.id }}+'" value="Unfollow" onclick="cancelfollow(this.name)" />' );}, 1000)
-                
-                {% else %}
-                     setTimeout(function () {$('#'+{{ equipment.id }}+'-user').html( '<input type="button"  name="'+{{equipment.id }}+'" value="Follow" onclick="follow(this.name)" />' );}, 1000)
-                {% endif %}
-        {% endfor %} 
-        </script>
+
+
 </body>
 </html>

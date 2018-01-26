@@ -8,3 +8,4 @@ django-notify-x==0.1.7
 jsonfield==2.0.2
 pytz==2017.2
 six==1.11.0
+django-cron==0.5.0
