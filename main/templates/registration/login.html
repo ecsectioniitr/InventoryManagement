@@ -1,13 +1,130 @@
-<form action="" method="post">
-  {% csrf_token %}
-  <label for="InputEmail" id="user">Username</label>
-  <input type="text"   name="username">
-</div>
-<div class="form-group">
-  <label for="InputPassword" id="passw" >Password</label>
-  <input type="password"   name="password">
-</div>
-<div class="form-group"> 
-  <button type="submit">Log In</button>
-</form>
-<br><h4>New User ?  <a href="{% url 'main:signup' %}">Signup</a></h4> 
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Login</title>
+	<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+<!-- jQuery library -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+<!-- Latest compiled JavaScript -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+<style type="text/css">
+	body,html{
+	border:0px;
+	margin:0px;	
+	}
+	.heading{
+		padding-top: 20px;
+		font-family: 'Raleway', sans-serif;
+		padding-bottom: 50px;
+		color: white;
+		font-weight: bolder;
+	}
+	.heading ,h1{
+		font-size: 50px;
+
+	}
+	.heading h1{
+		background-image:linear-gradient(rgba(188, 121, 52,0.8) 100%,rgba(255,255,255,1) 100%);
+		border:1.5px solid #7c5831;
+		padding-top: 5px;
+		padding-bottom: 5px;
+		box-shadow:0px 0px 50px black;
+	}
+	.signin-heading{
+		padding-top: 20px;
+		padding-bottom: 20px;
+	}
+	.signin-heading, h2{
+		font-size: 30px;
+		padding-bottom: 50px;
+		color: white;
+		font-family: 'Open Sans', sans-serif;
+	}
+	.signin{
+		padding-top: 20px;
+		padding-bottom: 50px;
+		border:1.5px solid #7c5831;
+		background-image:linear-gradient(rgba(188, 121, 52,0.8) 100%,rgba(255,255,255,1) 100%);
+		/*background-color: #1D90A4;*/
+		box-shadow:0px 0px 50px black;
+	}
+	body{
+		background-image: url("https://images.unsplash.com/4/madebyvadim.jpg?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=78688b2cbb91cc81bba44ed9f5b4dc9f&auto=format&fit=crop&w=1498&q=80");
+
+    /* Full height */
+    height: 100%; 
+
+    /* Center and scale the image nicely */
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+	}
+	input{
+		width: 80%;
+		height: 40px;
+		border:none;
+	}
+	button{
+		width: 80%! important;
+
+	}
+	.btn-primary, .btn-primary:hover, .btn-primary:active, .btn-primary:visited{
+		background-color: #bc7934! important;
+		border-color:#bc7934 ! important;
+	}
+	input:-webkit-autofill {
+    -webkit-box-shadow: 0 0 0 30px white inset;
+}
+a{
+	color: white! important;
+}
+</style>
+</head>
+<body>
+<div class="container">
+	<div class="heading">
+			
+		</div>
+	<div class="col-lg-4 col-md-4"></div>
+	<div class="main col-sm-12 col-lg-4 col-md-4">
+		
+		<div class="signin">
+			<div class="signin_heading">
+				<center><h2>Sign in</h2></center>
+			</div>
+			<center>
+			<div class="form">
+				
+				<form action="" method="post">
+					<div class="form-group">
+				  {% csrf_token %}
+				  <label for="InputEmail" id="user">Username</label>
+				  <input type="text"   name="username">
+				</div>
+				<div class="form-group">
+					<label for="InputPassword" id="passw" >Password</label>
+				  <input type="password"   name="password">
+				</div>
+				<div class="form-group"> 
+				  <button class="btn btn-primary btn-lg btn-block" type="submit">Login</button>
+				</div>
+				</form>
+			</div>
+			</center>
+			
+			<div class="buttons">
+				<center><h4>New User ?  <a href="{% url 'main:signup' %}">Signup</a></h4> </center>
+			</div>
+		</div>
+		</div>
+	</div>
+	<div class="col-lg-4 col-md-4"></div>
+</div>	
+
+</body>
+</html>
