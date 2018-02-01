@@ -2016,6 +2016,9 @@ fieldset[disabled] .form-control {
     vertical-align: middle;
     outline: 0;
     cursor: pointer;
+    border:1px solid transparent;
+    background-color: transparent;
+    padding-top: 13px;
 }
 
 .navbar .navbar-toggler.navbar-toggler-left {
@@ -4576,6 +4579,7 @@ Copyright (c) 2015 Daniel Eden
     }
     .navbar-header {
         float: none;
+        display: block !important;
     }
     .navbar-nav .show .dropdown-menu {
         position: static;
